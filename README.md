@@ -1,5 +1,4 @@
 # Electonic_vendor_Database
-# Electronic-Vendor-Database
 
 This is database maintaining the records of a electronic vendor like Best Buy
 
