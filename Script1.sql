@@ -1,6 +1,6 @@
 ﻿create table customer(
 custID varchar(10) not null primary key,
-NameCust char(50) not null,
+CustName char(50) not null,
 Email varchar(100) not null
 );
 
@@ -179,6 +179,50 @@ foreign key (addrID) references address_table,
 foreign key (trackingID,shipperName) references shipper
 );
 
+create table laptop_spec(
+lapnNme varchar(10) not null primary key,
+productID varchar(10) not null,
+companyName char(20) not null,
+screenresolution varchar(10),
+processor varchar(10),
+RAM varchar(20),
+GPU varchar(20),
+internalStorage varchar(20),
+lapOS varchar(10),
+lapOS_version varchar(10),
+foreign key(productID) references products,
+foreign key(companyName) references company,
+);
+
+create table phone_spec(
+phoneName varchar(20) not null primary key,
+productID varchar(10) not null,
+companyName char(20) not null,
+phoneStorage varchar(20),
+color char(10),
+frontcampixel varchar(10),
+backcampixel varchar(10),
+processor varchar(10),
+extStoragecapacity varchar(10),
+phoneOS varchar(10),
+phoneOS_version varchar(10),
+foreign key(productID) references products,
+foreign key(companyName) references company,
+);
+
+create table tablet_spec(
+tabName varchar(20) not null primary key,
+productID varchar(10) not null,
+companyName char(20) not null,
+screenResolution varchar(10),
+processor varchar(10),
+RAM varchar(20),
+tabStorage varchar(10),
+tabOS varchar(10),
+tabOS_version varchar(10),
+foreign key(productID) references products,
+foreign key(companyName) references company,
+);
 
 
 
