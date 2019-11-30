@@ -253,6 +253,13 @@ begin
    orderID = ord_seq.NEXTVAL;
 end;
 
+create table phoneandspec
+(
+  productID varchar(10),
+  phoneName varchar(20),
+  foreign key (productID) references products,
+  foreign key (phoneName) references phone_spec
+);
 
 create or replace view show_by_product as
 select 
@@ -262,3 +269,8 @@ when productType='Laptop' then b where b in  (select * from laptop_spec)
 else c where c in (select * from tablet_spec)
 end
 from products;
+
+create view show_by_product_phone
+as
+  select *
+  from phone_spec s join phoneandspec p on s.productID=p.productID;
