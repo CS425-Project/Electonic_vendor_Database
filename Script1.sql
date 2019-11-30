@@ -33,7 +33,7 @@ add price numeric(12,8);
 /*------relation-------*/
 create table orders(
 custID varchar(10) not null,
-productID varchar(10) not null
+productID varchar(10) not null,
 foreign key (custID) references customer,
 foreign key (productID) references products
 );
@@ -93,7 +93,7 @@ supplierID varchar(10) primary key
 );
 
 create table company(
-companyName char(20) primary key,
+companyName char(20) primary key
 );
 /*-------relation-----*/
 create table gets(
@@ -135,8 +135,8 @@ foreign key (addrID) references address_table
 create table orders_prod(
 orderID varchar(10) primary key,
 orderDate date,
-orderTime time,
-orderQty numeric(3),
+orderTime timestamp,
+orderQty numeric(10,3),
 transactionID varchar(10),
 foreign key (transactionID) references transactions
 );
@@ -144,7 +144,7 @@ foreign key (transactionID) references transactions
 create table located_at(
 addrID varchar(10),
 storeID varchar(10),
-warehouseID varchar(10)
+warehouseID varchar(10),
 foreign key (addrID) references address_table,
 foreign key (storeID) references stores,
 foreign key (warehouseID) references warehouse
@@ -180,7 +180,7 @@ foreign key (trackingID,shipperName) references shipper
 );
 
 create table laptop_spec(
-lapnNme varchar(10) not null primary key,
+lapName varchar(10) not null primary key,
 productID varchar(10) not null,
 companyName char(20) not null,
 screenresolution varchar(10),
@@ -191,7 +191,7 @@ internalStorage varchar(20),
 lapOS varchar(10),
 lapOS_version varchar(10),
 foreign key(productID) references products,
-foreign key(companyName) references company,
+foreign key(companyName) references company
 );
 
 create table phone_spec(
@@ -207,7 +207,7 @@ extStoragecapacity varchar(10),
 phoneOS varchar(10),
 phoneOS_version varchar(10),
 foreign key(productID) references products,
-foreign key(companyName) references company,
+foreign key(companyName) references company
 );
 
 create table tablet_spec(
@@ -221,8 +221,44 @@ tabStorage varchar(10),
 tabOS varchar(10),
 tabOS_version varchar(10),
 foreign key(productID) references products,
-foreign key(companyName) references company,
+foreign key(companyName) references company
 );
 
+create sequence cust_seq
+  minvalue 1
+  maxvalue 999999999999999999999999999
+  start with 1
+  increment by 1
+  cache 20;
+
+create or replace trigger cust_seq_trig
+before update on customer
+for each row 
+begin
+  :NEW.custID := cust_seq.NEXTVAL;
+end;
+
+create sequence ord_seq
+  minvalue 1
+  maxvalue 999999999999999999999999999
+  start with 1
+  increment by 1
+  cache 20;
+  
+create or replace trigger ord_seq_trig
+after update on transactions
+for each row 
+begin
+   update orders_prod set 
+   orderID = ord_seq.NEXTVAL;
+end;
 
 
+create or replace view show_by_product as
+select 
+case 
+when productType='Phone' then a where a in (select * from phone_spec)
+when productType='Laptop' then b where b in  (select * from laptop_spec)
+else c where c in (select * from tablet_spec)
+end
+from products;
