@@ -1,0 +1,302 @@
+
+use Electronic_vendor;
+
+create table customer(
+custID int not null identity(1,1) primary key,
+CustName varchar(50) not null,
+Email varchar(100) not null,
+pass varchar(25)
+);
+
+
+create table frequentCust(
+custID int not null,
+AccountNumber varchar(20) not null,
+CCNumber varchar(20) not null,
+ExpiryDate varchar(20) not null,
+foreign key (custID) references customer,
+foreign key (AccountNumber,CCNumber,ExpiryDate) references payment_details
+);
+ 
+
+create table infrequentCust(
+custID int not null,
+CCNumber varchar(20) not null,
+ExpiryDate varchar(20) not null,
+foreign key (custID) references customer,
+foreign key (CCNumber,ExpiryDate) references payment_details
+);
+
+create table payment_details(
+AccountNumber varchar(20),
+CCNumber varchar(20) primary key,
+ExpiryDate varchar(10),
+NameonCard varchar(30)
+);
+
+create table products(
+productID int identity(1,1) primary key,
+productType varchar(10)
+);
+
+
+/*------relation-------*/
+create table orders(
+custID int not null,
+productID int not null,
+foreign key (custID) references customer,
+foreign key (productID) references products
+);
+
+create table address_table(
+addrID int identity(1,1) primary key,
+addressLine1 varchar(20) not null,
+addressLine2 varchar(20),
+zipcode varchar(6) not null,
+city char(15) not null,
+state_a char(2) not null
+);
+
+create table stores(
+storeID int identity(1,1) primary key,
+addrID int not null,
+quantity numeric(5),
+productID int not null,
+foreign key (productID) references products;
+foreign key (addrID) references address_table
+);
+
+/*------relation------*/
+create table contains_prod(
+storeID int not null,
+productID int not null,
+foreign key (storeID) references stores,
+foreign key (productID) references products
+);
+
+create table warehouse(
+warehouseID int identity(1,1) primary key,
+storeID int not null,
+addrID int not null,
+quantity numeric(3),
+productID int not null,
+foreign key (addrID) references address_table,
+foreign key (storeID) references stores,
+foreign key (productID) references products
+);
+
+
+/*-------relation-----*/
+create table stocks(
+warehouseID int,
+productID int,
+foreign key (warehouseID) references warehouse,
+foreign key (productID) references products
+);
+
+/*------relation------*/
+create table sends(
+warehouseID int not null,
+storeID int not null,
+foreign key (warehouseID) references warehouse,
+foreign key (storeID) references stores
+);
+
+create table supplier(
+supplierID  int identity(1,1) primary key
+);
+
+create table company(
+companyName varchar(20) primary key,
+);
+
+
+/*-------relation-----*/
+create table gets(
+supplierID int not null,
+productID int not null,
+foreign key (supplierID) references supplier,
+foreign key (productID) references products
+);
+
+/*-------relation-----*/
+create table produces(
+companyName varchar(20) not null,
+productID int not null,
+foreign key (companyName) references company,
+foreign key (productID) references products
+);
+
+/*-------relation-----*/
+create table supplies(
+warehouseID int,
+supplierID int,
+foreign key (warehouseID) references warehouse,
+foreign key (supplierID) references supplier
+);
+
+/*-------relation-----*/
+create table sc(
+supplierID int,
+companyName varchar(20),
+foreign key (supplierID) references supplier,
+foreign key (companyName) references company
+);
+
+create table transactions(
+transactionID int identity(1,1) primary key,
+custID int,
+addrID int,
+foreign key (custID) references customer,
+foreign key (addrID) references address_table
+);
+
+
+create table orders_prod(
+orderID int identity(1,1) primary key,
+orderDate date,
+orderTime timestamp,
+orderQty numeric(10,3),
+transactionID int,
+productID int not null,
+foreign key (transactionID) references transactions,
+foreign key (productID) references products
+);
+
+/*-------relation-----*/
+create table located_at(
+addrID int,
+storeID int,
+warehouseID int,
+foreign key (addrID) references address_table,
+foreign key (storeID) references stores,
+foreign key (warehouseID) references warehouse
+);
+
+/*-------relation-----*/
+create table online_order(
+warehouseID int,
+orderID int,
+foreign key (warehouseID) references warehouse,
+foreign key (orderID) references orders_prod
+);
+
+create table shipper(
+trackingID int identity(1,1),
+shipperName varchar(20),
+shipperID int identity(1,1),
+primary key (trackingID,shipperID)
+);
+
+/*-------relation-----*/
+create table takes(
+orderID int,
+trackingID int,
+shipperID int,
+foreign key (orderID) references orders_prod,
+foreign key (trackingID,shipperID) references shipper
+);
+
+/*-------relation-----*/
+create table delivers(
+addrID int,
+trackingID int,
+shipperID int ,
+foreign key (addrID) references address_table,
+foreign key (trackingID,shipperID) references shipper
+);
+
+/*-------relation--------*/
+create table manufactured_by(
+companyName varchar(20) not null,
+lapName varchar(10) not null,
+phoneName varchar(20) not null,
+tabName varchar(20) not null,
+foreign key (companyName) references company,
+foreign key (lapName) references laptop_spec,
+foreign key (phoneName) references phone_spec,
+foreign key (tabName) references tablet_spec
+);
+
+
+create table laptop_spec(
+lapName varchar(10) not null primary key,
+productID int not null,
+companyName varchar(20) not null,
+screenresolution varchar(10),
+processor varchar(10),
+RAM varchar(20),
+GPU varchar(20),
+internalStorage varchar(20),
+lapOS varchar(10),
+lapOS_version varchar(10),
+price varchar(10),
+foreign key(productID) references products,
+foreign key(companyName) references company
+);
+
+create table phone_spec(
+phoneName varchar(20) not null primary key,
+productID int not null,
+companyName varchar(20) not null,
+phoneStorage varchar(20),
+color varchar(10),
+frontcampixel varchar(10),
+backcampixel varchar(10),
+processor varchar(30),
+extStoragecapacity varchar(10),
+phoneOS varchar(10),
+phoneOS_version varchar(10),
+price varchar(10),
+foreign key(productID) references products,
+foreign key(companyName) references company
+);
+
+
+create table tablet_spec(
+tabName varchar(20) not null primary key,
+productID int not null,
+companyName varchar(20) not null,
+screenResolution varchar(10),
+processor varchar(10),
+RAM varchar(20),
+tabStorage varchar(10),
+tabOS varchar(10),
+tabOS_version varchar(10),
+price varchar(10),
+foreign key(productID) references products,
+foreign key(companyName) references company
+);
+
+CREATE TRIGGER [dbo].[ord_trig]
+   ON  [dbo].[transactions]
+   after update
+AS 
+BEGIN
+	update orders_prod set orderID=orderID+1;
+
+END
+GO
+
+CREATE TRIGGER [dbo].[quan_trig]
+   ON  [dbo].[orders_prod]
+   after update
+AS 
+BEGIN
+if orderType = 'Instore'
+update stores set quantity=quantity-orders_prod.orderQty;
+else 
+update warehouse set quantity=quantity-orders_prod.orderQty;
+
+END
+GO
+
+CREATE TRIGGER [dbo].[shipper_trig]
+   ON  [dbo].[orders_prod]
+   after update
+AS 
+BEGIN
+update shipper set shipperID=shipperID+1;
+
+END
+GO
